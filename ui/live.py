@@ -2,7 +2,7 @@ import queue
 import threading
 import time
 import tkinter as tk
-from tkinter import scrolledtext
+from tkinter import scrolledtext, ttk
 from typing import TYPE_CHECKING
 
 from ..coaching.cue_coach import cue_matches_spoken_text, extract_cues
@@ -14,9 +14,9 @@ from ..core.constants import (
     LIVE_WINDOW_GEOMETRY,
     LIVE_WINDOW_TITLE,
 )
+from ..core.types import AudienceType
 from ..observations.log import append_observation
 from ..observations.rule_proposals import append_rule_proposal
-from ..ai.prompts import live_answer_prompt
 from .listening_indicator import ListeningIndicator
 from .text_format import configure_rich_text
 
@@ -83,7 +83,34 @@ class LiveInterviewUi:
             anchor="w",
             font=("Arial", 10),
         )
-        model_label.pack(fill=tk.X, pady=(0, 10))
+        model_label.pack(fill=tk.X, pady=(0, 5))
+
+        # Audience switcher
+        audience_frame = tk.Frame(container)
+        audience_frame.pack(fill=tk.X, pady=(0, 10))
+
+        self.audience_status = tk.StringVar(value=f"Audience: {self.coach.get_audience().value}")
+
+        def on_audience_change(event):
+            selected = self.audience_var.get()
+            for aud in AudienceType:
+                if aud.value == selected:
+                    self.coach.set_audience(aud)
+                    self.audience_status.set(f"Audience: {aud.value}")
+                    break
+
+        tk.Label(audience_frame, text="Audience:", font=("Arial", 10)).pack(side=tk.LEFT)
+        self.audience_var = tk.StringVar(value=self.coach.get_audience().value)
+        self.audience_combo = ttk.Combobox(
+            audience_frame,
+            textvariable=self.audience_var,
+            values=[a.value for a in AudienceType],
+            state="readonly",
+            width=15,
+            font=("Arial", 10),
+        )
+        self.audience_combo.pack(side=tk.LEFT, padx=5)
+        self.audience_combo.bind("<<ComboboxSelected>>", on_audience_change)
 
         self.indicator = ListeningIndicator(container)
         self.indicator.pack(fill=tk.X, pady=(0, 10))
@@ -322,16 +349,12 @@ class LiveInterviewUi:
 
     def _generate_answer(self, generation_id: int, transcript: str, is_final: bool) -> None:
         try:
-            prompt = live_answer_prompt(
-                self.coach.knowledge,
+            answer = self.coach.generate_live_cues(
                 transcript,
-                self.coach.config.project_name,
-                self.coach.config.speaker_name,
                 self.coach.config.live_context_chars,
                 self.coach.config.project_rules,
                 is_final=is_final,
             )
-            answer = self.coach.get_ai_response(prompt, max_tokens=self.coach.config.live_draft_max_tokens)
             self.events.put(("answer", (generation_id, answer, is_final)))
         except Exception as exc:
             self.events.put(("error", str(exc)))
@@ -348,7 +371,7 @@ class LiveInterviewUi:
         self.coaching_speaker = is_final
         self.status.set("Answer cues ready. Follow the green cue." if is_final else "Draft cues ready. Still listening...")
         if is_final:
-            guidance = "Live answer cues generated. The speaker should follow the green NEXT cue instead of reading a script."
+            guidance = "Live answer cues generated in systems-language style. The speaker should follow the green NEXT cue while explaining in their own words—concepts, not code."
             append_observation(
                 self.coach.config.observations_path,
                 mode="Live Interview Cues",
