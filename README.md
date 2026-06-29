@@ -1,214 +1,465 @@
 # Project Coach AI
 
-**Free open-source AI interview copilot, live interview assistant, and project defense coach**
+**Think in Code. Speak in Systems.**
 
-Project Coach AI is a free, open-source interview coach that listens to live questions, drafts natural talking points in real time, and helps you answer without sounding like you are reading from a script.
+---
 
-It is designed for:
+## What is Project Coach AI?
 
-- live interview answers and speaking cues
-- AI interview practice and mock interview preparation
-- project defense, founder demos, oral exams, and technical walkthroughs
-- people who want a free interview copilot instead of a paid subscription tool
+Project Coach AI is an **AI Project Understanding Engine**.
 
-Project Coach AI was created by **Abaka Daniel Ugonna** AKA **Big Dreams Web3**.
+It studies real software projects and helps developers understand, explain, defend, and improve them.
 
-## Why People Use It
+The interview assistant is only one capability. The real purpose is to become an **AI Project Understanding Engine**—the same way an experienced engineer, auditor, architect, founder, investor, or interviewer would understand a software project.
 
-Many people search for tools like:
+Project Coach AI understands entire software projects by examining:
 
-- free AI interview assistant
-- live interview AI
-- AI interview answer generator
-- interview copilot free
-- real-time AI interview helper
-- project defense coach
+- source code structure and patterns
+- documentation and comments
+- APIs and endpoints
+- functions and classes
+- configuration and architecture
+- project briefs and design notes
 
-Project Coach AI focuses on the part that matters most in a real conversation: it does not just print a long answer. It listens, generates short speaking cues, and tracks what you actually say so the next point feels natural.
+It then communicates that understanding using **systems-level concepts**—not implementation details.
 
-## What Makes It Different
+> **Example:** It internally understands `POST /api/auth/login` but externally communicates "Login Authentication Flow."
 
-- It generates **speaking cues**, not heavy script paragraphs.
-- It listens during live interview questions and drafts guidance before the interviewer fully finishes.
-- It listens while you answer and moves a green `NEXT` cue as your spoken answer progresses.
-- It uses AI to inspect observations and propose project-improvement rules when it detects a design, security, privacy, or architecture issue.
-- It does local cue tracking after the AI response is generated, which helps reduce API cost.
-- It can study a real project folder, a documentation folder, or a project brief file before generating guidance.
-- It shows the configured AI models and the last model used in the console and UI.
-- It is free and open source.
+---
 
-## How It Works
+## Why Does It Exist?
 
-### 1. Study the source material
+Developers often build systems they understand while writing them. Later, they struggle to explain:
 
-Point Project Coach AI to:
+- **Why** an architecture exists
+- **Why** a security model was chosen
+- **What** tradeoffs were accepted
+- **How** to defend decisions during interviews, demos, audits, or presentations
 
-- a codebase
-- a docs folder
-- a pitch note or project brief
-- multiple sources at once
+The gap between building and explaining is real. Project Coach AI closes that gap.
 
-### 2. Listen to the question
+After using Project Coach AI, developers finish sessions not only better prepared—they have a deeper understanding of their own project.
 
-In live mode, the app listens to the interviewer, detects pauses, and generates answer cues in real time.
+---
 
-### 3. Coach the answer
+## The Understanding Pipeline
 
-Instead of showing a book-like paragraph, it gives short points to say next. As you speak, it listens locally and advances the cue list when your spoken answer covers the current point.
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         PROJECT INPUT                                   │
+├─────────────────────────────────────────────────────────────────────────┤
+│   Source Code    Documentation    Project Briefs    Comments          │
+│   ───────────    ────────────    ─────────────    ─────────          │
+│   *.py, *.ts     README.md       ARCHITECTURE     docstrings          │
+│   *.js, *.rs     DESIGN.md       product specs    // why notes        │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                      SYSTEM TRANSLATOR                                 │
+├─────────────────────────────────────────────────────────────────────────┤
+│   Implementation Patterns ──────► System Concepts                      │
+│   ──────────────────────        ────────────────                       │
+│   auth endpoints      ──────►  Authentication Flow                    │
+│   payment handlers    ──────►  Payment Authorization                  │
+│   encrypt/decrypt     ──────►  Privacy Protection                      │
+│   database models     ──────►  Data Persistence                       │
+│   audit logging       ──────►  Audit Trail                            │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                       WHY EXTRACTION                                    │
+├─────────────────────────────────────────────────────────────────────────┤
+│   Purpose statements    Design rationale    Tradeoffs made             │
+│   ────────────────     ───────────────    ──────────────             │
+│   "protects against"   "designed to"      "tradeoff is"               │
+│   "prevents"           "because"          "妥协 (compromise)"         │
+└─────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     UNDERSTANDING OUTPUT                               │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                       │
+│   Project Defense          Architecture Explanation                     │
+│   ──────────────          ──────────────────────                       │
+│   "Why settlement         "The payment flow protects                  │
+│    before authorization?"   against unauthorized                      │
+│                            transfer by requiring..."                   │
+│                                                                       │
+│   Interview Coaching      Security Review                             │
+│   ────────────────       ────────────────                            │
+│   "How would you          "What assumptions does                      │
+│    explain this to         this privacy model                        │
+│    an investor?"           rely on?"                                  │
+│                                                                       │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
-### 4. Propose project improvements
+---
 
-Project Coach AI appends questions, cues, and answer observations to the observations file. It also runs a small AI review on those observations and writes improvement proposals when it detects a real product-design issue, privacy leak, security concern, incorrect project premise, or weak architecture assumption.
+## Think in Code. Speak in Systems.
 
-Improvement proposals are not applied automatically. You approve them before they become active coach rules.
+The core design philosophy:
 
-## Best Fit Use Cases
+**Internally**, the coach may inspect:
+- Files and folders
+- Endpoints and APIs
+- Functions and classes
+- Database models
+- Smart contracts
+- Configuration
 
-- free AI interview practice tool
-- real-time interview answer support
-- live interview speaking coach
-- founder pitch and startup demo prep
-- technical project defense prep
-- behavioral interview practice
-- engineering walkthrough rehearsal
-- AI-assisted project design review
-- privacy and security defense preparation
+**Externally**, it explains:
+- Authentication flows
+- Settlement processes
+- Identity verification
+- Payment authorization
+- Trust boundaries
+- Privacy protections
+- Security models
+- Architecture decisions
+- Product tradeoffs
+
+**Implementation details become supporting evidence—not the primary explanation.**
+
+### Example Transformations
+
+| Instead of asking... | The coach asks... |
+|---------------------|-------------------|
+| "What does `/api/auth/login` do?" | "Why does the authentication flow validate identity before creating a trusted session?" |
+| "What does `transfer_vault()` do?" | "What responsibility does the settlement layer have during a payment?" |
+| "Explain the encryption module." | "How does this privacy protection build user trust?" |
+
+### Answer Style
+
+Answers are designed for **speaking**, not documentation:
+
+> "Before anyone can proceed, the system double-checks that the identity presented is still trusted—similar to showing your boarding pass again before entering the aircraft instead of only at the airport entrance."
+
+---
+
+## Product Capabilities
+
+Project Coach AI provides these capabilities:
+
+| Capability | Description |
+|------------|-------------|
+| **Project Understanding** | Deep analysis of architecture, patterns, and decisions |
+| **Architecture Explanation** | Clear communication of design rationale |
+| **Technical Interview Preparation** | Practice answering questions confidently |
+| **Project Defense** | Defend technical decisions to reviewers |
+| **Security Review** | Prepare for security-focused questioning |
+| **Privacy Review** | Explain privacy protections clearly |
+| **Founder Demo Preparation** | Explain technical work to investors |
+| **Audit Question Generation** | Generate auditor-level questions |
+| **Live Speaking Coach** | Real-time cue generation while you speak |
+| **Observation-Based Learning** | Coach improves from experience |
+
+### How Capabilities Map to Features
+
+- **Practice Mode** → Interview preparation, architecture review, security review, project defense
+- **Live Mode** → Live speaking coach, real-time cue generation
+- **System Translator** → Project understanding, architecture explanation
+- **Observation Engine** → Observation-based learning, continuous improvement
+- **Audience Settings** → All capabilities adapt to different audiences
+
+---
+
+## Advanced Features
+
+### Audience Switching Mid-Session
+
+Change the explanation audience without restarting the session. Future questions, answers, and cues adapt immediately.
+
+In Practice Mode or Live Mode, use the audience dropdown to switch between:
+- **non-technical** — Simple language, analogies for investors/clients
+- **semi-technical** — Balanced approach for founders/product people
+- **technical** — More detail for engineers
+- **expert** — Full precision for auditors/security reviewers
+
+### System Concept Editor
+
+Review and refine auto-detected system concepts.
+
+Click **Edit Concepts** to:
+- View detected concepts (Authentication Flow, Payment Authorization, etc.)
+- Add custom analogies for specific concepts
+- Save changes to persist across sessions
+
+The editor saves to `project-coach-concepts.md` by default.
+
+### Custom Analogy Library
+
+Define project-specific analogies that the coach uses when explaining concepts.
+
+Example custom analogies:
+```
+TSN settlement like: a secure middle office that checks both sides before releasing value
+TINS like: a phonebook for payments that doesn't expose full personal details
+```
+
+Custom analogies are saved and reused for future coaching sessions.
+
+### Why Extraction with Categories
+
+The why extraction now categorizes findings:
+
+- `[purpose]` — Why something exists
+- `[protection]` — What it protects against
+- `[tradeoff]` — Design compromises made
+- `[risk]` — Potential failure scenarios
+- `[todo]` — Developer notes with reasoning
+
+### Quality Analytics (Lightweight)
+
+Explanation quality is tracked in observations:
+
+- **Helpful** — Cues helped explain clearly
+- **Needs Work** — Cues need improvement
+- **Not Useful** — Cues didn't help
+
+Quality ratings are logged alongside generated cues for future analysis.
+
+---
+
+## Real Workflow Examples
+
+### Preparing for a Software Engineering Interview
+
+1. Point Project Coach to your portfolio project
+2. Practice Mode generates questions like:
+   - "Why is this authentication step placed before session creation?"
+   - "What would break if this validation check disappeared?"
+3. Answer while speaking; the coach tracks your delivery
+4. Rate explanation quality to improve future sessions
+
+### Defending a Startup Architecture
+
+1. Set audience to `semi-technical` for investor meetings
+2. Point to your technical architecture documentation
+3. Practice explaining system purposes, not implementation
+4. Use Live Mode during actual demos for real-time support
+
+### Explaining a Blockchain Protocol
+
+1. Point to your smart contracts and documentation
+2. Set audience based on who you're addressing (investors, developers, regulators)
+3. The system translates contract functions to protocol concepts
+4. Generate questions an auditor might ask about settlement logic
+
+### Reviewing a Security-Sensitive Application
+
+1. Set audience to `expert` for security reviews
+2. The coach surfaces privacy and security patterns in your code
+3. Practice explaining attack surfaces and protections
+4. Generate auditor-level questions about assumptions
+
+### Preparing for an Investor Demo
+
+1. Set audience to `non-technical`
+2. The coach emphasizes analogies and simple explanations
+3. Practice explaining what the system does for users, not how it works
+4. Live Mode provides speaking cues during the actual demo
+
+### Rehearsing a University Project Defense
+
+1. Point to your project codebase and documentation
+2. Practice Mode generates questions an examiner might ask
+3. The coach helps you articulate design decisions
+4. Explanation quality tracking identifies areas to improve
+
+---
+
+## The Observation Engine
+
+Observations are not merely logs. They are **institutional knowledge** that helps the coach better understand and explain your project over time.
+
+### What Gets Observed
+
+- Questions asked during practice
+- Answers given (captured via speech)
+- Generated speaking cues
+- Explanation quality ratings (Helpful / Needs Work / Not Useful)
+- Approved coach rules
+
+### How It Improves Coaching
+
+```
+Observation Recorded
+       │
+       ▼
+┌─────────────────────┐
+│ Coach Review       │
+│ (AI analyzes if    │
+│ coaching can        │
+│ improve)            │
+└─────────────────────┘
+       │
+       ▼
+┌─────────────────────┐
+│ Improvement         │
+│ Proposal Generated  │
+│ (if warranted)       │
+└─────────────────────┘
+       │
+       ▼
+┌─────────────────────┐
+│ YOU Review &       │
+│ Approve            │
+└─────────────────────┘
+       │
+       ▼
+┌─────────────────────┐
+│ Approved Rule      │
+│ (Improves future   │
+│ coaching)           │
+└─────────────────────┘
+```
+
+**Proposals are never auto-applied.** You always review and approve before they become active rules. This keeps AI useful without letting it silently change project truth.
+
+---
+
+## Use Cases
+
+- **Interview preparation** — practice answering technical questions confidently
+- **Architecture reviews** — understand and defend design decisions
+- **Security reviews** — prepare for security-focused questioning
+- **Founder demos** — explain your technical work to investors
+- **Team onboarding** — document and communicate system purposes
+- **Self-reflection** — deepen your own understanding of your architecture
+
+---
 
 ## Quick Start
 
-Install the Python packages:
+### 1. Install dependencies
 
 ```powershell
-python -m pip install -r project_coach\requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-Create the app env file:
+### 2. Configure environment
+
+Create `.env` from the example:
 
 ```powershell
-Copy-Item project_coach\.env.example project_coach\.env
+Copy-Item .env.example .env
 ```
 
-Open `project_coach\.env` and set at least one AI provider key:
+Set at least one AI provider:
 
 ```env
 ANTHROPIC_API_KEY=
 GEMINI_API_KEY=
 ```
 
-Set the project identity and the material the coach should study:
+### 3. Point to your project
 
 ```env
-PROJECT_COACH_PROJECT_NAME=TrustLink Pay
-PROJECT_COACH_SPEAKER_NAME=Daniel
-PROJECT_COACH_SOURCE_PATHS=C:\Users\codepara\Desktop\trust-link
+PROJECT_COACH_PROJECT_NAME=Your Project Name
+PROJECT_COACH_SPEAKER_NAME=Your Name
+PROJECT_COACH_SOURCE_PATHS=C:\path\to\your\project
 ```
 
-`PROJECT_COACH_SOURCE_PATHS` can point to a code folder, a documentation folder, a single project brief, or multiple sources separated with semicolons:
+### 4. Set audience type (optional)
 
 ```env
-PROJECT_COACH_SOURCE_PATHS=C:\Projects\my-app;C:\Projects\my-app\pitch-notes.md
+PROJECT_COACH_AUDIENCE_TYPE=non-technical
 ```
 
-The active rules file is fixed at `project-coach-rules.md`. It is loaded directly by the app and is not configurable through the env file.
+Options: `non-technical` (default), `semi-technical`, `technical`, `expert`
 
-Run the app:
+### 5. Run
 
 ```powershell
 python -m project_coach
 ```
 
-## Live Interview Mode
+Choose Practice Mode or Live Interview Mode.
 
-Live Interview Mode is the strongest part of the app for real-time use:
+---
 
-- it listens to the interviewer
-- it detects silence and question boundaries
-- it drafts answer cues with low-cost models
-- it uses a transparent overlay so you can still see the interviewer
-- it listens to your answer and advances the next cue locally
+## Configuration Options
 
-This makes it more useful than a plain AI answer generator, because the tool keeps coaching delivery, not just content.
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `PROJECT_COACH_AUDIENCE_TYPE` | Explanation depth | `non-technical` |
+| `PROJECT_COACH_PRACTICE_MODEL_ANSWER` | Show model answers | `false` |
+| `PROJECT_COACH_QUESTION_MAX_TOKENS` | Question length | `90` |
+| `PROJECT_COACH_ANSWER_MAX_TOKENS` | Answer length | `220` |
+| `PROJECT_COACH_LIVE_DRAFT_MAX_TOKENS` | Live cue length | `170` |
 
-## Practice Mode
+---
 
-Practice Mode is built for repetition:
+## Architecture
 
-- it generates project-aware practice questions
-- it waits for a meaningful spoken answer instead of accepting random silence
-- it keeps listening until enough useful context is captured
-- it writes observations that can later be reviewed for product improvements
-- it runs a low-token AI proposal review when a question or observation suggests a project-design problem
+```
+project_coach/
+├── ai/
+│   ├── clients.py       # AI provider routing (Gemini, Claude)
+│   └── prompts.py       # Prompt builders with audience awareness
+├── coaching/
+│   ├── cue_coach.py     # Local cue extraction and tracking
+│   ├── rule_proposals.py # Improvement proposal generation
+│   └── answer_quality.py  # Answer quality assessment
+├── core/
+│   ├── config.py        # Configuration and environment
+│   ├── constants.py     # Defaults and limits
+│   └── types.py         # Type definitions
+├── knowledge/
+│   ├── loader.py        # Project knowledge loading
+│   ├── system_translator.py # Code to concepts translation
+│   └── analogies.py     # Analogy library
+├── observations/
+│   ├── log.py          # Observation recording
+│   └── rule_proposals.py # Rule proposal handling
+├── speech/
+│   └── recognizer.py    # Microphone and transcription
+└── ui/
+    ├── practice.py      # Practice mode interface
+    └── live.py          # Live interview interface
+```
+
+### Data Flow
+
+```
+Source Files → Knowledge Loader → System Translator → ProjectUnderstanding
+                                      │
+                                      ▼
+                              Why Extraction
+                                      │
+                                      ▼
+                              Audience-Adjusted Prompts
+                                      │
+                                      ▼
+                              AI Response Generation
+                                      │
+                                      ▼
+                              Speaking Cues → UI Display
+                                      │
+                                      ▼
+                              Observation Recording → Quality Tracking
+```
+
+---
 
 ## Cost Control
 
-Project Coach AI defaults to lower-cost settings:
+Built for efficiency:
 
-- `gemini-2.5-flash-lite` first
-- `claude-haiku-4-5` fallback
-- smaller context windows
-- shorter outputs
-- small AI review budget for improvement proposals
-- optional model answers disabled by default in practice mode
-- local cue tracking after generation
+- Prioritizes lower-cost AI models (`gemini-2.5-flash-lite`)
+- Local speech recognition and cue tracking
+- Small context windows by default
+- Token budget controls for each operation
+- No repeated AI calls for cue progression (handled locally)
 
-Current budget controls in `project_coach\.env`:
+---
 
-```env
-PROJECT_COACH_PROVIDER_ORDER=gemini,claude
-PROJECT_COACH_PRACTICE_MODEL_ANSWER=false
-PROJECT_COACH_QUESTION_MAX_TOKENS=90
-PROJECT_COACH_ANSWER_MAX_TOKENS=220
-PROJECT_COACH_LIVE_DRAFT_MAX_TOKENS=170
-PROJECT_COACH_PROPOSAL_MAX_TOKENS=180
-PROJECT_COACH_PRACTICE_CONTEXT_CHARS=3500
-PROJECT_COACH_LIVE_CONTEXT_CHARS=2800
-PROJECT_COACH_LIVE_REGENERATE_AFTER_CHARS=160
-PROJECT_COACH_LIVE_WINDOW_ALPHA=0.52
-PROJECT_COACH_MIN_ANSWER_WORDS=10
-PROJECT_COACH_MIN_ANSWER_KEY_TERMS=4
-PROJECT_COACH_OBSERVATIONS_PATH=project-coach-observations.md
-PROJECT_COACH_IMPROVEMENT_PROPOSALS_PATH=project-coach-improvement-proposals.md
-```
+## About
 
-## How The Content Is Produced
+Project Coach AI was created by **Abaka Daniel Ugonna** AKA **Big Dreams Web3**.
 
-Project Coach AI combines:
-
-- AI-generated question and cue generation
-- local speech recognition
-- local cue matching
-- local answer-quality checks
-- local observation logging
-
-The most important behavior after generation, especially cue progression and answer capture checks, happens locally rather than through repeated AI calls.
-
-## Observation-To-Rule Flow
-
-Project Coach observations do not automatically rewrite `project-coach-rules.md`.
-
-When an observation suggests the coach misunderstood the architecture or surfaced a weak product-design premise, Project Coach asks the configured AI model to inspect the observation against the project context and active rules. If the model finds a real issue, Project Coach writes an improvement proposal to `PROJECT_COACH_IMPROVEMENT_PROPOSALS_PATH`.
-
-A proposed rule becomes active only after you approve it from the UI, which appends it to `project-coach-rules.md`. This keeps AI useful without letting it silently rewrite the truth of the project.
-
-## Folder Structure
-
-- `ai/` contains provider clients and prompt builders.
-- `coaching/` contains local cue tracking and answer-quality checks.
-- `core/` contains config, constants, and shared types.
-- `knowledge/` contains project/source loading.
-- `observations/` contains the observation writer and improvement proposal flow.
-- `speech/` contains microphone and transcription handling.
-- `ui/` contains the practice/live interfaces and UI formatting helpers.
-
-## Support The Project
-
-If Project Coach AI helps you:
-
-- star the repository
-- share it with other founders, students, and job seekers
-- tip the developer if you want to support future improvements
-
-Solana tip address:
-`GccmLozniucy66RnzDQYvBK2dtWgaAktN8gYfzkTobRM`
-
-Project Coach AI is part of the broader work of **Abaka Daniel Ugonna** AKA **Big Dreams Web3**.
+Part of the broader mission to make every developer an expert communicator of their own architecture.

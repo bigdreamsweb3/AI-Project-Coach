@@ -5,7 +5,11 @@ from .constants import (
     ANTHROPIC_MODEL_ENV,
     ANSWER_MAX_TOKENS,
     ANSWER_MAX_TOKENS_ENV,
+    AUDIENCE_TYPE_ENV,
+    CONCEPTS_PATH,
+    CONCEPTS_PATH_ENV,
     DEFAULT_ANTHROPIC_MODEL,
+    DEFAULT_AUDIENCE_TYPE,
     DEFAULT_GEMINI_MODEL,
     GEMINI_MODEL_ENV,
     LIVE_CONTEXT_CHARS,
@@ -37,7 +41,7 @@ from .constants import (
     SPEAKER_NAME_ENV,
     SOURCE_PATHS_ENV,
 )
-from .types import CoachConfig
+from .types import AudienceType, CoachConfig
 
 
 APP_DIR = Path(__file__).resolve().parents[1]
@@ -73,6 +77,7 @@ def build_config() -> CoachConfig:
         gemini_model=os.getenv(GEMINI_MODEL_ENV, DEFAULT_GEMINI_MODEL),
         project_name=project_name,
         speaker_name=os.getenv(SPEAKER_NAME_ENV, "the project builder"),
+        audience_type=parse_audience_type(os.getenv(AUDIENCE_TYPE_ENV)),
         source_paths=source_paths,
         rules_path=rules_path,
         project_rules=load_project_rules(rules_path),
@@ -108,6 +113,7 @@ def build_config() -> CoachConfig:
             os.getenv(IMPROVEMENT_PROPOSALS_PATH_ENV),
             IMPROVEMENT_PROPOSALS_PATH,
         ),
+        concepts_path=parse_path(os.getenv(CONCEPTS_PATH_ENV), CONCEPTS_PATH),
     )
 
 
@@ -146,6 +152,18 @@ def parse_bool(raw_value: str | None, default: bool) -> bool:
     if raw_value is None:
         return default
     return raw_value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def parse_audience_type(raw_value: str | None) -> AudienceType:
+    if raw_value is None:
+        return AudienceType.NON_TECHNICAL
+
+    normalized = raw_value.strip().lower()
+    for audience in AudienceType:
+        if audience.value == normalized or audience.name.lower() == normalized:
+            return audience
+
+    return AudienceType.NON_TECHNICAL
 
 
 def parse_int(raw_value: str | None, default: int, minimum: int, maximum: int) -> int:
