@@ -16,7 +16,9 @@ class TrustLinkCoach:
         self.speech = SpeechRecognizer()
 
     def get_ai_response(self, prompt: str, max_tokens: int = 150) -> str:
-        return self.ai.generate(prompt, max_tokens)
+        response = self.ai.generate(prompt, max_tokens)
+        print(f"AI used: {self.ai.last_model_label()}")
+        return response
 
     def create_practice_question(self) -> PracticeQuestion:
         question = self.get_ai_response(
@@ -62,13 +64,13 @@ def main() -> None:
     print(f"Project: {coach.config.project_name}")
     print(f"Speaker: {coach.config.speaker_name}")
     print(f"Provider order: {', '.join(coach.config.provider_order)}")
+    print(f"Configured AI models: {coach.ai.active_models_label()}")
     print(f"Practice model answers: {'on' if coach.config.practice_model_answer_enabled else 'off'}")
     print("Knowledge sources:")
     for source_path in coach.config.source_paths:
         print(f"  - {source_path}")
     print(f"Rules: {coach.config.rules_path}")
-    print(f"Claude model: {coach.config.anthropic_model}")
-    print(f"Gemini model: {coach.config.gemini_model}")
+    print(f"Proposal review max tokens: {coach.config.proposal_max_tokens}")
     print("1. Practice Mode (with UI)")
     print("2. Live Interview Mode")
 

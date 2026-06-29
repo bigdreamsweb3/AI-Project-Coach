@@ -51,6 +51,7 @@ class LiveInterviewUi:
         self.root.attributes("-alpha", self.coach.config.live_window_alpha)
 
         self.status = tk.StringVar(value="Ready")
+        self.model_status = tk.StringVar(value=f"AI models: {self.coach.ai.active_models_label()}")
         self.indicator: ListeningIndicator
         self.transcript_text: scrolledtext.ScrolledText
         self.answer_text: scrolledtext.ScrolledText
@@ -75,6 +76,14 @@ class LiveInterviewUi:
             font=("Arial", 13, "bold"),
         )
         status_label.pack(fill=tk.X, pady=(0, 10))
+
+        model_label = tk.Label(
+            container,
+            textvariable=self.model_status,
+            anchor="w",
+            font=("Arial", 10),
+        )
+        model_label.pack(fill=tk.X, pady=(0, 10))
 
         self.indicator = ListeningIndicator(container)
         self.indicator.pack(fill=tk.X, pady=(0, 10))
@@ -335,25 +344,41 @@ class LiveInterviewUi:
         self.active_cue_index = 0
         self.logged_answer_completion = False
         self._render_cues()
+        self.model_status.set(f"AI models: {self.coach.ai.active_models_label()} | Last used: {self.coach.ai.last_model_label()}")
         self.coaching_speaker = is_final
         self.status.set("Answer cues ready. Follow the green cue." if is_final else "Draft cues ready. Still listening...")
         if is_final:
             guidance = "Live answer cues generated. The speaker should follow the green NEXT cue instead of reading a script."
             append_observation(
-                self.coach.config.observation_log_path,
+                self.coach.config.observations_path,
                 mode="Live Interview Cues",
                 project_name=self.coach.config.project_name,
                 question=self._transcript(),
                 guidance=guidance,
                 answer="\n".join(self.cues),
             )
-            for proposal in propose_rules_from_observation(self._transcript(), guidance, self.coach.config.project_rules):
-                append_rule_proposal(
-                    self.coach.config.rule_proposals_path,
-                    mode="Live Interview Cues",
-                    question=self._transcript(),
-                    proposal=proposal,
+            try:
+                for proposal in propose_rules_from_observation(
+                    self.coach.ai,
+                    self.coach.config.project_name,
+                    self.coach.knowledge,
+                    self._transcript(),
+                    guidance,
+                    self.coach.config.project_rules,
+                    self.coach.config.live_context_chars,
+                    self.coach.config.proposal_max_tokens,
+                ):
+                    append_rule_proposal(
+                        self.coach.config.improvement_proposals_path,
+                        mode="Live Interview Cues",
+                        question=self._transcript(),
+                        proposal=proposal,
+                    )
+                self.model_status.set(
+                    f"AI models: {self.coach.ai.active_models_label()} | Last used: {self.coach.ai.last_model_label()}"
                 )
+            except Exception as exc:
+                self.status.set(f"Proposal review failed: {exc}")
 
         if self.pending_generation:
             pending_final = self.pending_generation_final
@@ -370,7 +395,7 @@ class LiveInterviewUi:
             if self.active_cue_index >= len(self.cues) and not self.logged_answer_completion:
                 self.logged_answer_completion = True
                 append_observation(
-                    self.coach.config.observation_log_path,
+                    self.coach.config.observations_path,
                     mode="Live Answer Complete",
                     project_name=self.coach.config.project_name,
                     question=self._transcript(),

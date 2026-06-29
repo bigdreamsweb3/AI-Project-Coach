@@ -18,14 +18,15 @@ class CoachConfig:
     question_max_tokens: int
     answer_max_tokens: int
     live_draft_max_tokens: int
+    proposal_max_tokens: int
     practice_context_chars: int
     live_context_chars: int
     live_regenerate_after_chars: int
     live_window_alpha: float
     min_answer_words: int
     min_answer_key_terms: int
-    observation_log_path: Path
-    rule_proposals_path: Path
+    observations_path: Path
+    improvement_proposals_path: Path
 
 
 @dataclass(frozen=True)

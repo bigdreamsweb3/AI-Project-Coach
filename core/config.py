@@ -20,19 +20,20 @@ from .constants import (
     MIN_ANSWER_KEY_TERMS_ENV,
     MIN_ANSWER_WORDS,
     MIN_ANSWER_WORDS_ENV,
-    OBSERVATION_LOG_PATH,
-    OBSERVATION_LOG_PATH_ENV,
+    IMPROVEMENT_PROPOSALS_PATH,
+    IMPROVEMENT_PROPOSALS_PATH_ENV,
+    OBSERVATIONS_PATH,
+    OBSERVATIONS_PATH_ENV,
     PRACTICE_CONTEXT_CHARS,
     PRACTICE_CONTEXT_CHARS_ENV,
     PRACTICE_MODEL_ANSWER_ENV,
+    PROPOSAL_MAX_TOKENS,
+    PROPOSAL_MAX_TOKENS_ENV,
     PROJECT_NAME_ENV,
     PROVIDER_ORDER_ENV,
     QUESTION_MAX_TOKENS,
     QUESTION_MAX_TOKENS_ENV,
     RULES_PATH,
-    RULES_PATH_ENV,
-    RULE_PROPOSALS_PATH,
-    RULE_PROPOSALS_PATH_ENV,
     SPEAKER_NAME_ENV,
     SOURCE_PATHS_ENV,
 )
@@ -62,7 +63,7 @@ def load_env_file(env_path: Path = APP_ENV_PATH) -> None:
 def build_config() -> CoachConfig:
     load_env_file()
     source_paths = parse_source_paths(os.getenv(SOURCE_PATHS_ENV))
-    rules_path = parse_path(os.getenv(RULES_PATH_ENV), RULES_PATH)
+    rules_path = parse_path(None, RULES_PATH)
     project_name = os.getenv(PROJECT_NAME_ENV, source_paths[0].stem if source_paths else Path.cwd().name)
 
     return CoachConfig(
@@ -80,6 +81,7 @@ def build_config() -> CoachConfig:
         question_max_tokens=parse_int(os.getenv(QUESTION_MAX_TOKENS_ENV), QUESTION_MAX_TOKENS, minimum=40, maximum=300),
         answer_max_tokens=parse_int(os.getenv(ANSWER_MAX_TOKENS_ENV), ANSWER_MAX_TOKENS, minimum=80, maximum=700),
         live_draft_max_tokens=parse_int(os.getenv(LIVE_DRAFT_MAX_TOKENS_ENV), LIVE_DRAFT_MAX_TOKENS, minimum=80, maximum=500),
+        proposal_max_tokens=parse_int(os.getenv(PROPOSAL_MAX_TOKENS_ENV), PROPOSAL_MAX_TOKENS, minimum=80, maximum=400),
         practice_context_chars=parse_int(os.getenv(PRACTICE_CONTEXT_CHARS_ENV), PRACTICE_CONTEXT_CHARS, minimum=1000, maximum=12000),
         live_context_chars=parse_int(os.getenv(LIVE_CONTEXT_CHARS_ENV), LIVE_CONTEXT_CHARS, minimum=1000, maximum=12000),
         live_regenerate_after_chars=parse_int(
@@ -101,8 +103,11 @@ def build_config() -> CoachConfig:
             minimum=2,
             maximum=30,
         ),
-        observation_log_path=parse_path(os.getenv(OBSERVATION_LOG_PATH_ENV), OBSERVATION_LOG_PATH),
-        rule_proposals_path=parse_path(os.getenv(RULE_PROPOSALS_PATH_ENV), RULE_PROPOSALS_PATH),
+        observations_path=parse_path(os.getenv(OBSERVATIONS_PATH_ENV), OBSERVATIONS_PATH),
+        improvement_proposals_path=parse_path(
+            os.getenv(IMPROVEMENT_PROPOSALS_PATH_ENV),
+            IMPROVEMENT_PROPOSALS_PATH,
+        ),
     )
 
 

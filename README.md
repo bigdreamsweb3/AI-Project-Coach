@@ -11,7 +11,7 @@ It is designed for:
 - project defense, founder demos, oral exams, and technical walkthroughs
 - people who want a free interview copilot instead of a paid subscription tool
 
-Project Coach AI was created by **BigDreamsWeb3** and **Abaka Daniel Ugonna**.
+Project Coach AI was created by **Abaka Daniel Ugonna** AKA **Big Dreams Web3**.
 
 ## Why People Use It
 
@@ -31,8 +31,10 @@ Project Coach AI focuses on the part that matters most in a real conversation: i
 - It generates **speaking cues**, not heavy script paragraphs.
 - It listens during live interview questions and drafts guidance before the interviewer fully finishes.
 - It listens while you answer and moves a green `NEXT` cue as your spoken answer progresses.
+- It uses AI to inspect observations and propose project-improvement rules when it detects a design, security, privacy, or architecture issue.
 - It does local cue tracking after the AI response is generated, which helps reduce API cost.
 - It can study a real project folder, a documentation folder, or a project brief file before generating guidance.
+- It shows the configured AI models and the last model used in the console and UI.
 - It is free and open source.
 
 ## How It Works
@@ -54,9 +56,11 @@ In live mode, the app listens to the interviewer, detects pauses, and generates 
 
 Instead of showing a book-like paragraph, it gives short points to say next. As you speak, it listens locally and advances the cue list when your spoken answer covers the current point.
 
-### 4. Log useful observations
+### 4. Propose project improvements
 
-Project Coach AI appends questions, cues, and answer observations to the observation log so the product can be improved over time.
+Project Coach AI appends questions, cues, and answer observations to the observations file. It also runs a small AI review on those observations and writes improvement proposals when it detects a real product-design issue, privacy leak, security concern, incorrect project premise, or weak architecture assumption.
+
+Improvement proposals are not applied automatically. You approve them before they become active coach rules.
 
 ## Best Fit Use Cases
 
@@ -67,6 +71,8 @@ Project Coach AI appends questions, cues, and answer observations to the observa
 - technical project defense prep
 - behavioral interview practice
 - engineering walkthrough rehearsal
+- AI-assisted project design review
+- privacy and security defense preparation
 
 ## Quick Start
 
@@ -95,7 +101,6 @@ Set the project identity and the material the coach should study:
 PROJECT_COACH_PROJECT_NAME=TrustLink Pay
 PROJECT_COACH_SPEAKER_NAME=Daniel
 PROJECT_COACH_SOURCE_PATHS=C:\Users\codepara\Desktop\trust-link
-PROJECT_COACH_RULES_PATH=project-coach-rules.md
 ```
 
 `PROJECT_COACH_SOURCE_PATHS` can point to a code folder, a documentation folder, a single project brief, or multiple sources separated with semicolons:
@@ -104,7 +109,7 @@ PROJECT_COACH_RULES_PATH=project-coach-rules.md
 PROJECT_COACH_SOURCE_PATHS=C:\Projects\my-app;C:\Projects\my-app\pitch-notes.md
 ```
 
-Use `PROJECT_COACH_RULES_PATH` for project truths the coach must not override. This is useful when raw code contains old helpers, compatibility routes, or future placeholders that should not be described as live product behavior.
+The active rules file is fixed at `project-coach-rules.md`. It is loaded directly by the app and is not configurable through the env file.
 
 Run the app:
 
@@ -132,6 +137,7 @@ Practice Mode is built for repetition:
 - it waits for a meaningful spoken answer instead of accepting random silence
 - it keeps listening until enough useful context is captured
 - it writes observations that can later be reviewed for product improvements
+- it runs a low-token AI proposal review when a question or observation suggests a project-design problem
 
 ## Cost Control
 
@@ -141,6 +147,7 @@ Project Coach AI defaults to lower-cost settings:
 - `claude-haiku-4-5` fallback
 - smaller context windows
 - shorter outputs
+- small AI review budget for improvement proposals
 - optional model answers disabled by default in practice mode
 - local cue tracking after generation
 
@@ -152,14 +159,15 @@ PROJECT_COACH_PRACTICE_MODEL_ANSWER=false
 PROJECT_COACH_QUESTION_MAX_TOKENS=90
 PROJECT_COACH_ANSWER_MAX_TOKENS=220
 PROJECT_COACH_LIVE_DRAFT_MAX_TOKENS=170
+PROJECT_COACH_PROPOSAL_MAX_TOKENS=180
 PROJECT_COACH_PRACTICE_CONTEXT_CHARS=3500
 PROJECT_COACH_LIVE_CONTEXT_CHARS=2800
 PROJECT_COACH_LIVE_REGENERATE_AFTER_CHARS=160
 PROJECT_COACH_LIVE_WINDOW_ALPHA=0.52
 PROJECT_COACH_MIN_ANSWER_WORDS=10
 PROJECT_COACH_MIN_ANSWER_KEY_TERMS=4
-PROJECT_COACH_OBSERVATION_LOG_PATH=project-coach-obs.md
-PROJECT_COACH_RULE_PROPOSALS_PATH=project-coach-rule-proposals.md
+PROJECT_COACH_OBSERVATIONS_PATH=project-coach-observations.md
+PROJECT_COACH_IMPROVEMENT_PROPOSALS_PATH=project-coach-improvement-proposals.md
 ```
 
 ## How The Content Is Produced
@@ -178,7 +186,9 @@ The most important behavior after generation, especially cue progression and ans
 
 Project Coach observations do not automatically rewrite `project-coach-rules.md`.
 
-When an observation suggests the coach misunderstood the architecture or surfaced a bad product-design premise, Project Coach writes a proposed rule to `PROJECT_COACH_RULE_PROPOSALS_PATH`. A proposed rule becomes active only after you approve it from the UI, which appends it to `PROJECT_COACH_RULES_PATH`.
+When an observation suggests the coach misunderstood the architecture or surfaced a weak product-design premise, Project Coach asks the configured AI model to inspect the observation against the project context and active rules. If the model finds a real issue, Project Coach writes an improvement proposal to `PROJECT_COACH_IMPROVEMENT_PROPOSALS_PATH`.
+
+A proposed rule becomes active only after you approve it from the UI, which appends it to `project-coach-rules.md`. This keeps AI useful without letting it silently rewrite the truth of the project.
 
 ## Folder Structure
 
@@ -186,7 +196,7 @@ When an observation suggests the coach misunderstood the architecture or surface
 - `coaching/` contains local cue tracking and answer-quality checks.
 - `core/` contains config, constants, and shared types.
 - `knowledge/` contains project/source loading.
-- `observations/` contains the observation log writer.
+- `observations/` contains the observation writer and improvement proposal flow.
 - `speech/` contains microphone and transcription handling.
 - `ui/` contains the practice/live interfaces and UI formatting helpers.
 
@@ -201,4 +211,4 @@ If Project Coach AI helps you:
 Solana tip address:
 `GccmLozniucy66RnzDQYvBK2dtWgaAktN8gYfzkTobRM`
 
-Project Coach AI is part of the broader work of **Abaka Daniel Ugonna** AKA **BigDreamsWeb3**.
+Project Coach AI is part of the broader work of **Abaka Daniel Ugonna** AKA **Big Dreams Web3**.

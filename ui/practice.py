@@ -39,6 +39,14 @@ def run_practice_ui(coach: "TrustLinkCoach") -> None:
     indicator = ListeningIndicator(root)
     indicator.pack(fill=tk.X, padx=10, pady=(10, 0))
 
+    model_label = tk.Label(
+        root,
+        text=f"AI models: {coach.ai.active_models_label()}",
+        anchor="w",
+        font=("Arial", 10),
+    )
+    model_label.pack(fill=tk.X, padx=10, pady=(4, 0))
+
     text_area = scrolledtext.ScrolledText(
         root,
         wrap=tk.WORD,
@@ -55,6 +63,7 @@ def run_practice_ui(coach: "TrustLinkCoach") -> None:
         indicator.set_idle("Generating practice question")
         practice_question = coach.create_practice_question()
         current_question["text"] = practice_question.question
+        model_label.configure(text=f"AI models: {coach.ai.active_models_label()} | Last used: {coach.ai.last_model_label()}")
 
         append_plain(text_area, "\nQuestion\n", "label")
         append_markdown(text_area, practice_question.question)
@@ -63,7 +72,7 @@ def run_practice_ui(coach: "TrustLinkCoach") -> None:
             append_markdown(text_area, practice_question.model_answer)
         append_plain(text_area, "\nYour Answer\n", "label")
         append_observation(
-            coach.config.observation_log_path,
+            coach.config.observations_path,
             mode="Practice Question",
             project_name=coach.config.project_name,
             question=practice_question.question,
@@ -153,7 +162,7 @@ def run_practice_ui(coach: "TrustLinkCoach") -> None:
                 indicator.set_done("Answer captured")
                 append_plain(text_area, "\n\n")
                 append_observation(
-                    coach.config.observation_log_path,
+                    coach.config.observations_path,
                     mode="Practice Answer",
                     project_name=coach.config.project_name,
                     question=current_question["text"],
@@ -169,18 +178,32 @@ def run_practice_ui(coach: "TrustLinkCoach") -> None:
 
     def _show_rule_proposals(question: str, guidance: str) -> None:
         pending_rule_proposals.clear()
-        pending_rule_proposals.extend(
-            propose_rules_from_observation(question, guidance, coach.config.project_rules)
-        )
+        try:
+            pending_rule_proposals.extend(
+                propose_rules_from_observation(
+                    coach.ai,
+                    coach.config.project_name,
+                    coach.knowledge,
+                    question,
+                    guidance,
+                    coach.config.project_rules,
+                    coach.config.practice_context_chars,
+                    coach.config.proposal_max_tokens,
+                )
+            )
+            model_label.configure(text=f"AI models: {coach.ai.active_models_label()} | Last used: {coach.ai.last_model_label()}")
+        except Exception as exc:
+            indicator.set_error(f"Proposal review failed: {exc}")
+            return
 
         if not pending_rule_proposals:
             return
 
-        append_plain(text_area, "\nRule Proposal\n", "label")
+        append_plain(text_area, "\nImprovement Proposal\n", "label")
         for proposal in pending_rule_proposals:
             append_plain(text_area, f"{proposal.title}\n{proposal.reason}\n{proposal.rule_text}\n")
             append_rule_proposal(
-                coach.config.rule_proposals_path,
+                coach.config.improvement_proposals_path,
                 mode="Practice Question",
                 question=question,
                 proposal=proposal,

@@ -65,6 +65,8 @@ class AiRouter:
     ) -> None:
         self.providers = list(providers)
         self.provider_order = tuple(provider_order)
+        self.last_provider_name = ""
+        self.last_model = ""
         if not self.providers:
             raise AiConfigurationError(configuration_help())
 
@@ -81,6 +83,8 @@ class AiRouter:
             try:
                 text = provider.generate(prompt, max_tokens)
                 if text:
+                    self.last_provider_name = provider.name
+                    self.last_model = provider.model
                     return text
                 errors.append(f"{provider.name}: empty response")
             except Exception as exc:
@@ -88,6 +92,20 @@ class AiRouter:
 
         joined_errors = "\n".join(f"  - {error}" for error in errors)
         raise RuntimeError(f"All configured AI providers failed:\n{joined_errors}")
+
+    def active_models_label(self) -> str:
+        providers = sorted(
+            self.providers,
+            key=lambda provider: self.provider_order.index(provider.name)
+            if provider.name in self.provider_order
+            else len(self.provider_order),
+        )
+        return ", ".join(f"{provider.name}: {provider.model}" for provider in providers)
+
+    def last_model_label(self) -> str:
+        if not self.last_provider_name or not self.last_model:
+            return "No AI call yet"
+        return f"{self.last_provider_name}: {self.last_model}"
 
 
 def build_ai_router(config: CoachConfig) -> AiRouter:
