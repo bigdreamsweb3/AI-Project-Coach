@@ -5,21 +5,23 @@ import tkinter as tk
 from tkinter import scrolledtext
 from typing import TYPE_CHECKING
 
-from .cue_coach import cue_matches_spoken_text, extract_cues
-from .constants import (
+from ..coaching.cue_coach import cue_matches_spoken_text, extract_cues
+from ..coaching.rule_proposals import propose_rules_from_observation
+from ..core.constants import (
     LIVE_DONE_AFTER_SILENCE_SECONDS,
     LIVE_LISTEN_TIMEOUT_SECONDS,
     LIVE_PHRASE_TIME_LIMIT_SECONDS,
     LIVE_WINDOW_GEOMETRY,
     LIVE_WINDOW_TITLE,
 )
+from ..observations.log import append_observation
+from ..observations.rule_proposals import append_rule_proposal
+from ..ai.prompts import live_answer_prompt
 from .listening_indicator import ListeningIndicator
-from .observation_log import append_observation
-from .prompts import live_answer_prompt
 from .text_format import configure_rich_text
 
 if TYPE_CHECKING:
-    from .app import TrustLinkCoach
+    from ..app import TrustLinkCoach
 
 
 class LiveInterviewUi:
@@ -317,6 +319,7 @@ class LiveInterviewUi:
                 self.coach.config.project_name,
                 self.coach.config.speaker_name,
                 self.coach.config.live_context_chars,
+                self.coach.config.project_rules,
                 is_final=is_final,
             )
             answer = self.coach.get_ai_response(prompt, max_tokens=self.coach.config.live_draft_max_tokens)
@@ -335,14 +338,22 @@ class LiveInterviewUi:
         self.coaching_speaker = is_final
         self.status.set("Answer cues ready. Follow the green cue." if is_final else "Draft cues ready. Still listening...")
         if is_final:
+            guidance = "Live answer cues generated. The speaker should follow the green NEXT cue instead of reading a script."
             append_observation(
                 self.coach.config.observation_log_path,
                 mode="Live Interview Cues",
                 project_name=self.coach.config.project_name,
                 question=self._transcript(),
-                guidance="Live answer cues generated. The speaker should follow the green NEXT cue instead of reading a script.",
+                guidance=guidance,
                 answer="\n".join(self.cues),
             )
+            for proposal in propose_rules_from_observation(self._transcript(), guidance, self.coach.config.project_rules):
+                append_rule_proposal(
+                    self.coach.config.rule_proposals_path,
+                    mode="Live Interview Cues",
+                    question=self._transcript(),
+                    proposal=proposal,
+                )
 
         if self.pending_generation:
             pending_final = self.pending_generation_final

@@ -1,8 +1,74 @@
-# Project Coach
+# Project Coach AI
 
-Project Coach is a live interview and project-defense trainer. It listens through your microphone, builds a transcript in short real audio chunks, detects when the speaker has paused, and generates a suggested answer while the question is still being asked.
+**Free open-source AI interview copilot, live interview assistant, and project defense coach**
 
-## Setup
+Project Coach AI is a free, open-source interview coach that listens to live questions, drafts natural talking points in real time, and helps you answer without sounding like you are reading from a script.
+
+It is designed for:
+
+- live interview answers and speaking cues
+- AI interview practice and mock interview preparation
+- project defense, founder demos, oral exams, and technical walkthroughs
+- people who want a free interview copilot instead of a paid subscription tool
+
+Project Coach AI was created by **BigDreamsWeb3** and **Abaka Daniel Ugonna**.
+
+## Why People Use It
+
+Many people search for tools like:
+
+- free AI interview assistant
+- live interview AI
+- AI interview answer generator
+- interview copilot free
+- real-time AI interview helper
+- project defense coach
+
+Project Coach AI focuses on the part that matters most in a real conversation: it does not just print a long answer. It listens, generates short speaking cues, and tracks what you actually say so the next point feels natural.
+
+## What Makes It Different
+
+- It generates **speaking cues**, not heavy script paragraphs.
+- It listens during live interview questions and drafts guidance before the interviewer fully finishes.
+- It listens while you answer and moves a green `NEXT` cue as your spoken answer progresses.
+- It does local cue tracking after the AI response is generated, which helps reduce API cost.
+- It can study a real project folder, a documentation folder, or a project brief file before generating guidance.
+- It is free and open source.
+
+## How It Works
+
+### 1. Study the source material
+
+Point Project Coach AI to:
+
+- a codebase
+- a docs folder
+- a pitch note or project brief
+- multiple sources at once
+
+### 2. Listen to the question
+
+In live mode, the app listens to the interviewer, detects pauses, and generates answer cues in real time.
+
+### 3. Coach the answer
+
+Instead of showing a book-like paragraph, it gives short points to say next. As you speak, it listens locally and advances the cue list when your spoken answer covers the current point.
+
+### 4. Log useful observations
+
+Project Coach AI appends questions, cues, and answer observations to the observation log so the product can be improved over time.
+
+## Best Fit Use Cases
+
+- free AI interview practice tool
+- real-time interview answer support
+- live interview speaking coach
+- founder pitch and startup demo prep
+- technical project defense prep
+- behavioral interview practice
+- engineering walkthrough rehearsal
+
+## Quick Start
 
 Install the Python packages:
 
@@ -29,6 +95,7 @@ Set the project identity and the material the coach should study:
 PROJECT_COACH_PROJECT_NAME=TrustLink Pay
 PROJECT_COACH_SPEAKER_NAME=Daniel
 PROJECT_COACH_SOURCE_PATHS=C:\Users\codepara\Desktop\trust-link
+PROJECT_COACH_RULES_PATH=project-coach-rules.md
 ```
 
 `PROJECT_COACH_SOURCE_PATHS` can point to a code folder, a documentation folder, a single project brief, or multiple sources separated with semicolons:
@@ -37,30 +104,47 @@ PROJECT_COACH_SOURCE_PATHS=C:\Users\codepara\Desktop\trust-link
 PROJECT_COACH_SOURCE_PATHS=C:\Projects\my-app;C:\Projects\my-app\pitch-notes.md
 ```
 
-## Run
+Use `PROJECT_COACH_RULES_PATH` for project truths the coach must not override. This is useful when raw code contains old helpers, compatibility routes, or future placeholders that should not be described as live product behavior.
+
+Run the app:
 
 ```powershell
 python -m project_coach
 ```
 
-Choose Practice Mode to generate project-defense questions and model answers from the configured knowledge sources.
+## Live Interview Mode
 
-Choose Live Interview Mode to listen to a real interviewer, show the transcript, detect pauses, and draft an answer before the interviewer fully finishes the question.
+Live Interview Mode is the strongest part of the app for real-time use:
 
-When the answer is ready, Project Coach shows short speaking cues instead of a script. As you answer out loud, it listens locally and moves the green `NEXT` marker through the cues so you know what point to say next without sounding like you are reading.
+- it listens to the interviewer
+- it detects silence and question boundaries
+- it drafts answer cues with low-cost models
+- it uses a transparent overlay so you can still see the interviewer
+- it listens to your answer and advances the next cue locally
 
-## Model Configuration
+This makes it more useful than a plain AI answer generator, because the tool keeps coaching delivery, not just content.
 
-Project Coach defaults to:
+## Practice Mode
 
-- Claude: `claude-haiku-4-5`
-- Gemini: `gemini-2.5-flash-lite`
+Practice Mode is built for repetition:
 
-Override them in `project_coach\.env` with `PROJECT_COACH_ANTHROPIC_MODEL` and `PROJECT_COACH_GEMINI_MODEL`.
+- it generates project-aware practice questions
+- it waits for a meaningful spoken answer instead of accepting random silence
+- it keeps listening until enough useful context is captured
+- it writes observations that can later be reviewed for product improvements
 
-## Budget Controls
+## Cost Control
 
-The default settings favor low API cost:
+Project Coach AI defaults to lower-cost settings:
+
+- `gemini-2.5-flash-lite` first
+- `claude-haiku-4-5` fallback
+- smaller context windows
+- shorter outputs
+- optional model answers disabled by default in practice mode
+- local cue tracking after generation
+
+Current budget controls in `project_coach\.env`:
 
 ```env
 PROJECT_COACH_PROVIDER_ORDER=gemini,claude
@@ -71,10 +155,50 @@ PROJECT_COACH_LIVE_DRAFT_MAX_TOKENS=170
 PROJECT_COACH_PRACTICE_CONTEXT_CHARS=3500
 PROJECT_COACH_LIVE_CONTEXT_CHARS=2800
 PROJECT_COACH_LIVE_REGENERATE_AFTER_CHARS=160
+PROJECT_COACH_LIVE_WINDOW_ALPHA=0.52
+PROJECT_COACH_MIN_ANSWER_WORDS=10
+PROJECT_COACH_MIN_ANSWER_KEY_TERMS=4
+PROJECT_COACH_OBSERVATION_LOG_PATH=project-coach-obs.md
+PROJECT_COACH_RULE_PROPOSALS_PATH=project-coach-rule-proposals.md
 ```
 
-Set `PROJECT_COACH_PRACTICE_MODEL_ANSWER=true` only when you want the app to spend an extra API call generating a sample answer for each practice question.
+## How The Content Is Produced
 
-Increase `PROJECT_COACH_LIVE_REGENERATE_AFTER_CHARS` if live interviews are costing too much. Decrease it only when you need faster draft updates while the interviewer is still speaking.
+Project Coach AI combines:
 
-Cue tracking does not call the AI again. The AI is used to create the cue list; matching your spoken words to the next cue happens locally.
+- AI-generated question and cue generation
+- local speech recognition
+- local cue matching
+- local answer-quality checks
+- local observation logging
+
+The most important behavior after generation, especially cue progression and answer capture checks, happens locally rather than through repeated AI calls.
+
+## Observation-To-Rule Flow
+
+Project Coach observations do not automatically rewrite `project-coach-rules.md`.
+
+When an observation suggests the coach misunderstood the architecture or surfaced a bad product-design premise, Project Coach writes a proposed rule to `PROJECT_COACH_RULE_PROPOSALS_PATH`. A proposed rule becomes active only after you approve it from the UI, which appends it to `PROJECT_COACH_RULES_PATH`.
+
+## Folder Structure
+
+- `ai/` contains provider clients and prompt builders.
+- `coaching/` contains local cue tracking and answer-quality checks.
+- `core/` contains config, constants, and shared types.
+- `knowledge/` contains project/source loading.
+- `observations/` contains the observation log writer.
+- `speech/` contains microphone and transcription handling.
+- `ui/` contains the practice/live interfaces and UI formatting helpers.
+
+## Support The Project
+
+If Project Coach AI helps you:
+
+- star the repository
+- share it with other founders, students, and job seekers
+- tip the developer if you want to support future improvements
+
+Solana tip address:
+`GccmLozniucy66RnzDQYvBK2dtWgaAktN8gYfzkTobRM`
+
+Project Coach AI is part of the broader work of **Abaka Daniel Ugonna** AKA **BigDreamsWeb3**.

@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 
-from .config import configuration_help
-from .types import CoachConfig
+from ..core.config import configuration_help
+from ..core.types import CoachConfig
 
 
 class AiConfigurationError(RuntimeError):

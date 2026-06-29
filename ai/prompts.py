@@ -1,10 +1,14 @@
-def practice_question_prompt(knowledge: str, project_name: str, context_chars: int) -> str:
+def practice_question_prompt(knowledge: str, project_name: str, context_chars: int, project_rules: str) -> str:
     return f"""You are an experienced technical project-defense interviewer.
 Project name: {project_name}
+Authoritative project rules:
+{project_rules or "No separate project rules file was provided."}
+
 Project context: {knowledge[:context_chars]}
 
 Ask one strong technical question about the project architecture, product design, security model, implementation decisions, or user value.
-Keep the question short and direct."""
+Keep the question short and direct.
+Do not invent product features, auth methods, security flows, or future roadmap items that are not present in the authoritative rules or project context."""
 
 
 def model_answer_prompt(question: str, project_name: str, speaker_name: str, context_chars: int) -> str:
@@ -21,6 +25,7 @@ def live_answer_prompt(
     project_name: str,
     speaker_name: str,
     context_chars: int,
+    project_rules: str,
     is_final: bool = True,
 ) -> str:
     status = (
@@ -30,6 +35,9 @@ def live_answer_prompt(
     )
 
     return f"""Project name: {project_name}
+Authoritative project rules:
+{project_rules or "No separate project rules file was provided."}
+
 Project context: {knowledge[:context_chars]}
 
 Interview transcript: {question}
@@ -37,4 +45,5 @@ Interview transcript: {question}
 Status: {status}
 
 Give {speaker_name} short speaking cues, not a script. Use 4 to 6 bullets.
-Each bullet should be a natural point to say next in a real conversation."""
+Each bullet should be a natural point to say next in a real conversation.
+Do not mention features, auth methods, security flows, or roadmap items that are not supported by the authoritative rules or project context."""

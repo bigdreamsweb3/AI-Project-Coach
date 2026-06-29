@@ -29,13 +29,17 @@ from .constants import (
     PROVIDER_ORDER_ENV,
     QUESTION_MAX_TOKENS,
     QUESTION_MAX_TOKENS_ENV,
+    RULES_PATH,
+    RULES_PATH_ENV,
+    RULE_PROPOSALS_PATH,
+    RULE_PROPOSALS_PATH_ENV,
     SPEAKER_NAME_ENV,
     SOURCE_PATHS_ENV,
 )
 from .types import CoachConfig
 
 
-APP_DIR = Path(__file__).resolve().parent
+APP_DIR = Path(__file__).resolve().parents[1]
 APP_ENV_PATH = APP_DIR / ".env"
 
 
@@ -58,6 +62,7 @@ def load_env_file(env_path: Path = APP_ENV_PATH) -> None:
 def build_config() -> CoachConfig:
     load_env_file()
     source_paths = parse_source_paths(os.getenv(SOURCE_PATHS_ENV))
+    rules_path = parse_path(os.getenv(RULES_PATH_ENV), RULES_PATH)
     project_name = os.getenv(PROJECT_NAME_ENV, source_paths[0].stem if source_paths else Path.cwd().name)
 
     return CoachConfig(
@@ -68,6 +73,8 @@ def build_config() -> CoachConfig:
         project_name=project_name,
         speaker_name=os.getenv(SPEAKER_NAME_ENV, "the project builder"),
         source_paths=source_paths,
+        rules_path=rules_path,
+        project_rules=load_project_rules(rules_path),
         provider_order=parse_provider_order(os.getenv(PROVIDER_ORDER_ENV)),
         practice_model_answer_enabled=parse_bool(os.getenv(PRACTICE_MODEL_ANSWER_ENV), default=False),
         question_max_tokens=parse_int(os.getenv(QUESTION_MAX_TOKENS_ENV), QUESTION_MAX_TOKENS, minimum=40, maximum=300),
@@ -95,6 +102,7 @@ def build_config() -> CoachConfig:
             maximum=30,
         ),
         observation_log_path=parse_path(os.getenv(OBSERVATION_LOG_PATH_ENV), OBSERVATION_LOG_PATH),
+        rule_proposals_path=parse_path(os.getenv(RULE_PROPOSALS_PATH_ENV), RULE_PROPOSALS_PATH),
     )
 
 
@@ -165,6 +173,13 @@ def parse_path(raw_value: str | None, default: str) -> Path:
     if not path.is_absolute():
         path = (Path.cwd() / path).resolve()
     return path
+
+
+def load_project_rules(path: Path) -> str:
+    try:
+        return path.read_text(encoding="utf-8").strip()
+    except OSError:
+        return ""
 
 
 def configuration_help() -> str:

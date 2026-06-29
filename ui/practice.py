@@ -5,20 +5,22 @@ import tkinter as tk
 from tkinter import scrolledtext
 from typing import TYPE_CHECKING
 
-from .answer_quality import answer_guidance, is_meaningful_answer
-from .constants import (
+from ..coaching.answer_quality import answer_guidance, is_meaningful_answer
+from ..coaching.rule_proposals import RuleProposal, propose_rules_from_observation
+from ..core.constants import (
     LIVE_DONE_AFTER_SILENCE_SECONDS,
     LIVE_LISTEN_TIMEOUT_SECONDS,
     LIVE_PHRASE_TIME_LIMIT_SECONDS,
     WINDOW_GEOMETRY,
     WINDOW_TITLE,
 )
+from ..observations.log import append_observation
+from ..observations.rule_proposals import append_rule_proposal, approve_rule
 from .listening_indicator import ListeningIndicator
-from .observation_log import append_observation
 from .text_format import append_markdown, append_plain, configure_rich_text
 
 if TYPE_CHECKING:
-    from .app import TrustLinkCoach
+    from ..app import TrustLinkCoach
 
 
 def run_practice_ui(coach: "TrustLinkCoach") -> None:
@@ -32,6 +34,7 @@ def run_practice_ui(coach: "TrustLinkCoach") -> None:
     listening_state = {"active": False, "last_audio_at": 0.0, "marked_done": False}
     answer_parts: list[str] = []
     current_question = {"text": ""}
+    pending_rule_proposals: list[RuleProposal] = []
 
     indicator = ListeningIndicator(root)
     indicator.pack(fill=tk.X, padx=10, pady=(10, 0))
@@ -65,6 +68,10 @@ def run_practice_ui(coach: "TrustLinkCoach") -> None:
             project_name=coach.config.project_name,
             question=practice_question.question,
             guidance="Practice question generated. The speaker should answer with enough project-specific context before capture.",
+        )
+        _show_rule_proposals(
+            practice_question.question,
+            "Practice question generated. Review any proposed rules before changing project truth.",
         )
 
         print("Speak your answer...")
@@ -160,7 +167,41 @@ def run_practice_ui(coach: "TrustLinkCoach") -> None:
 
         root.after(100, _process_events)
 
+    def _show_rule_proposals(question: str, guidance: str) -> None:
+        pending_rule_proposals.clear()
+        pending_rule_proposals.extend(
+            propose_rules_from_observation(question, guidance, coach.config.project_rules)
+        )
+
+        if not pending_rule_proposals:
+            return
+
+        append_plain(text_area, "\nRule Proposal\n", "label")
+        for proposal in pending_rule_proposals:
+            append_plain(text_area, f"{proposal.title}\n{proposal.reason}\n{proposal.rule_text}\n")
+            append_rule_proposal(
+                coach.config.rule_proposals_path,
+                mode="Practice Question",
+                question=question,
+                proposal=proposal,
+            )
+
+    def _approve_pending_rule() -> None:
+        if not pending_rule_proposals:
+            indicator.set_idle("No pending rule proposal")
+            return
+
+        approved = 0
+        for proposal in pending_rule_proposals:
+            if approve_rule(coach.config.rules_path, proposal):
+                approved += 1
+
+        pending_rule_proposals.clear()
+        indicator.set_done(f"Approved {approved} rule proposal(s)")
+        append_plain(text_area, f"\nApproved {approved} rule proposal(s).\n")
+
     tk.Button(root, text="Ask New Question", command=ask, font=("Arial", 12)).pack(pady=10)
+    tk.Button(root, text="Approve Rule Proposal", command=_approve_pending_rule, font=("Arial", 12)).pack(pady=5)
     tk.Button(root, text="Exit", command=root.quit, font=("Arial", 12)).pack(pady=5)
 
     root.after(100, _process_events)

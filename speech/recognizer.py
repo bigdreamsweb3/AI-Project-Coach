@@ -1,4 +1,4 @@
-from .types import SpeechChunk
+from ..core.types import SpeechChunk
 
 
 class SpeechRecognizer:

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from .constants import KNOWLEDGE_CHARS_PER_FILE, KNOWLEDGE_FILE_LIMIT
+from ..core.constants import KNOWLEDGE_CHARS_PER_FILE, KNOWLEDGE_FILE_LIMIT
 
 
 EXCLUDED_DIRS = {".git", ".next", "dist", "node_modules", "target"}

@@ -11,6 +11,8 @@ class CoachConfig:
     project_name: str
     speaker_name: str
     source_paths: tuple[Path, ...]
+    rules_path: Path
+    project_rules: str
     provider_order: tuple[str, ...]
     practice_model_answer_enabled: bool
     question_max_tokens: int
@@ -23,6 +25,7 @@ class CoachConfig:
     min_answer_words: int
     min_answer_key_terms: int
     observation_log_path: Path
+    rule_proposals_path: Path
 
 
 @dataclass(frozen=True)
